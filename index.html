@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d0c0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="L'Offensive">
+<link rel="manifest" href='data:application/manifest+json,{"name":"L Offensive","short_name":"Offensive","display":"standalone","background_color":"#0d0c0f","theme_color":"#0d0c0f","start_url":"."}'>
+<title>L'OFFENSIVE — pipeline de candidatures</title>
+<style>
+  :root{
+    --bg:#0d0c0f; --bg2:#16141a; --bg3:#1f1c25; --line:#2d2937;
+    --txt:#eeecf2; --dim:#918b9f;
+    --acc:#ff6b5c; --accd:#d94836;
+    --blue:#5b9cff; --purple:#a78bfa; --ok:#3ecf7a; --bad:#ff5c6c; --gold:#f5b840;
+    --r:14px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    overscroll-behavior:none}
+  #app{max-width:520px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+  main{flex:1;padding:16px 16px 90px}
+  header{padding:14px 16px 0;display:flex;align-items:center;justify-content:space-between}
+  .logo{font-weight:900;font-size:17px;letter-spacing:1.5px}
+  .logo span{color:var(--acc)}
+  .badge{font-weight:700;font-size:13px;background:var(--bg2);border:1px solid var(--line);padding:6px 11px;border-radius:20px}
+
+  .card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px}
+  h1.page{font-size:22px;font-weight:800;margin-bottom:14px}
+  .sub{color:var(--dim);font-size:13px}
+  .btn{display:inline-block;border:none;border-radius:12px;padding:13px 20px;font-size:15px;font-weight:700;cursor:pointer;
+    background:var(--acc);color:#fff;width:100%;text-align:center;margin-top:12px}
+  .btn:active{transform:scale(.97)}
+  .btn.ghost{background:var(--bg3);color:var(--txt);border:1px solid var(--line)}
+  .btn.small{width:auto;padding:8px 13px;font-size:13px;margin-top:0}
+  .btn.ok{background:var(--ok);color:#02180b}
+  .btn.danger{background:#3a1a20;color:var(--bad);border:1px solid #55232c}
+
+  /* quota hero */
+  .hero{background:linear-gradient(135deg,#1d1216,#2a1418);border:1px solid var(--line)}
+  .quota{display:flex;gap:6px;margin:10px 0 6px}
+  .quota i{flex:1;height:12px;border-radius:6px;background:#0009}
+  .quota i.on{background:linear-gradient(90deg,var(--accd),var(--acc))}
+  .hero .big{font-size:20px;font-weight:800}
+  .hero .xptxt{font-size:12px;color:var(--dim)}
+
+  /* coach */
+  .coach{background:var(--bg2);border-left:3px solid var(--acc);border-radius:0 var(--r) var(--r) 0;
+    padding:13px 14px;margin-bottom:12px;font-size:14px;line-height:1.5;color:#e3dfe9}
+  .coach b{color:var(--acc)}
+
+  /* action rows */
+  .act{display:flex;align-items:center;gap:11px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);
+    padding:13px;margin-bottom:8px;cursor:pointer}
+  .act:active{background:var(--bg3)}
+  .act .ico{width:38px;height:38px;border-radius:11px;background:var(--bg3);display:flex;align-items:center;
+    justify-content:center;font-size:18px;flex-shrink:0}
+  .act .t{flex:1;min-width:0}
+  .act .t b{display:block;font-size:14px}
+  .act .t small{color:var(--dim);font-size:12px}
+  .act.urgent{border-color:var(--acc)}
+  .act.urgent .ico{background:#3a1a20}
+
+  /* pipeline */
+  .col{margin-bottom:16px}
+  .col h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-left:4px;display:flex;justify-content:space-between}
+  .col h2 .n{color:var(--dim)}
+  .appcard{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:13px;margin-bottom:8px}
+  .appcard .top{display:flex;align-items:baseline;gap:8px;cursor:pointer}
+  .appcard .top b{font-size:15px;flex:1}
+  .appcard .plat{font-size:11px;color:var(--dim);background:var(--bg3);padding:3px 8px;border-radius:8px;font-weight:700;flex-shrink:0}
+  .appcard .role{font-size:13px;color:var(--dim);margin-top:2px}
+  .appcard .age{font-size:11px;color:var(--dim);margin-top:4px}
+  .appcard .age.late{color:var(--acc);font-weight:700}
+  .appcard .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .empty{text-align:center;color:var(--dim);font-size:14px;padding:26px 10px;line-height:1.6}
+
+  /* chasse */
+  .target{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
+  .target b{font-size:16px}
+  .target .why{font-size:13px;color:var(--dim);margin:4px 0 10px;line-height:1.45}
+  .platlinks{display:flex;gap:6px;flex-wrap:wrap}
+  .platlinks a{text-decoration:none;background:var(--bg3);border:1px solid var(--line);color:var(--txt);
+    padding:8px 12px;border-radius:10px;font-size:13px;font-weight:700}
+  .platlinks a:active{background:var(--acc)}
+  .target .del{float:right;color:var(--dim);cursor:pointer;padding:2px 8px}
+
+  /* forms */
+  label.f{display:block;font-size:12px;color:var(--dim);font-weight:700;margin:12px 0 5px;text-transform:uppercase;letter-spacing:.5px}
+  input.f,textarea.f,select.f{width:100%;background:var(--bg3);border:1px solid var(--line);border-radius:11px;
+    padding:12px;color:var(--txt);font-size:15px;outline:none;font-family:inherit}
+  textarea.f{min-height:90px;resize:vertical}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+  .chip{padding:8px 13px;border-radius:18px;background:var(--bg3);border:1px solid var(--line);font-size:13px;font-weight:700;cursor:pointer}
+  .chip.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+
+  /* stats */
+  .statgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:14px;text-align:center}
+  .stat b{display:block;font-size:24px;color:var(--acc)}
+  .stat small{color:var(--dim);font-size:12px}
+  .funnel .frow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .funnel .frow small{width:86px;color:var(--dim);font-size:12px;font-weight:700;flex-shrink:0}
+  .funnel .bar{flex:1;height:22px;background:var(--bg3);border-radius:6px;overflow:hidden}
+  .funnel .bar i{display:block;height:100%;border-radius:6px}
+  .funnel .frow b{width:26px;text-align:right;font-size:14px}
+  .weekbars{display:flex;gap:6px;align-items:flex-end;height:80px;margin-top:12px}
+  .weekbars .colw{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:4px;text-align:center}
+  .weekbars .bar{background:linear-gradient(180deg,var(--acc),var(--accd));border-radius:4px;min-height:2px}
+  .weekbars .colw.z .bar{background:var(--bg3)}
+  .weekbars small{font-size:10px;color:var(--dim);font-weight:700}
+  .qline{border-top:2px dashed var(--gold);position:relative;margin-top:-2px}
+
+  /* overlay */
+  .overlay{position:fixed;inset:0;background:var(--bg);z-index:50;overflow-y:auto;display:none}
+  .overlay.open{display:block}
+  .overlay .inner{max-width:520px;margin:0 auto;padding:16px 16px 40px}
+  .topbar{display:flex;align-items:center;gap:12px;margin-bottom:8px;position:sticky;top:0;background:var(--bg);padding:12px 0;z-index:5}
+  .topbar .back{width:38px;height:38px;border-radius:11px;background:var(--bg2);border:1px solid var(--line);color:var(--txt);font-size:18px;cursor:pointer}
+  .topbar b{font-size:16px}
+
+  nav{position:fixed;bottom:0;left:0;right:0;background:rgba(13,12,15,.93);backdrop-filter:blur(12px);border-top:1px solid var(--line);z-index:40}
+  nav .in{max-width:520px;margin:0 auto;display:flex}
+  nav button{flex:1;background:none;border:none;color:var(--dim);padding:10px 0 max(10px,env(safe-area-inset-bottom));font-size:11px;font-weight:700;cursor:pointer}
+  nav button .i{display:block;font-size:20px;margin-bottom:2px}
+  nav button.on{color:var(--acc)}
+  #toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-90px);background:var(--bg3);border:1px solid var(--acc);
+    color:var(--txt);padding:12px 22px;border-radius:14px;font-weight:700;z-index:100;transition:transform .35s;font-size:14px;max-width:90vw;text-align:center}
+  #toast.show{transform:translateX(-50%) translateY(0)}
+  .fab{position:fixed;right:18px;bottom:84px;width:56px;height:56px;border-radius:50%;background:var(--acc);color:#fff;
+    border:none;font-size:28px;font-weight:400;cursor:pointer;z-index:39;box-shadow:0 4px 20px #ff6b5c66}
+  .tpltxt{background:var(--bg3);border:1px solid var(--line);border-radius:11px;padding:13px;font-size:14px;
+    line-height:1.55;color:#d9d5e0;white-space:pre-wrap;user-select:text;-webkit-user-select:text}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">L'OFFEN<span>SIVE</span></div>
+    <div class="badge" id="wkBadge">🔥 0 sem</div>
+  </header>
+  <main id="main"></main>
+  <nav><div class="in">
+    <button data-tab="today" class="on"><span class="i">🎯</span>Aujourd'hui</button>
+    <button data-tab="pipe"><span class="i">📋</span>Pipeline</button>
+    <button data-tab="hunt"><span class="i">🔍</span>Chasse</button>
+    <button data-tab="me"><span class="i">👤</span>Profil</button>
+  </div></nav>
+</div>
+<button class="fab" id="fab">＋</button>
+<div class="overlay" id="overlay"><div class="inner" id="overlayInner"></div></div>
+<div id="toast"></div>
+
+<script>
+/* ================================================================
+   L'OFFENSIVE — pipeline de candidatures (stage / alternance / job)
+   ================================================================ */
+
+const PLATFORMS=['LinkedIn','Indeed','WTTJ','JobTeaser','HelloWork','Réseau','Candidature spontanée','Autre'];
+const STATUSES=[
+  ['reperee','🔎 Repérées','#918b9f'],
+  ['postulee','✉️ Postulées','#5b9cff'],
+  ['relancee','📨 Relancées','#a78bfa'],
+  ['entretien','🎙 Entretiens','#f5b840'],
+  ['offre','🏆 Offres','#3ecf7a'],
+  ['refus','❌ Refus / Sans suite','#ff5c6c'],
+];
+const NEXT={reperee:['postulee'],postulee:['relancee','entretien','refus'],relancee:['entretien','refus'],entretien:['offre','refus'],offre:[],refus:[]};
+const STATUS_LABEL=Object.fromEntries(STATUSES.map(([k,l])=>[k,l]));
+const RELANCE_DELAI=7; // jours sans réponse avant relance
+
+const DEFAULT={
+  apps:[], targets:[], cv:'', pitch:'', loc:'Paris', quota:5, name:'Thomas'
+};
+let S=load();
+function load(){ try{ return Object.assign({},DEFAULT,JSON.parse(localStorage.getItem('offensive')||'{}')); }catch(e){ return {...DEFAULT}; } }
+function save(){ localStorage.setItem('offensive',JSON.stringify(S)); }
+const todayStr=()=>new Date().toISOString().slice(0,10);
+const daysSince=d=>Math.floor((Date.now()-new Date(d+'T12:00'))/864e5);
+function weekKey(dateStr){
+  const dt=new Date(dateStr+'T12:00:00');
+  dt.setDate(dt.getDate()+3-((dt.getDay()+6)%7));
+  const w1=new Date(dt.getFullYear(),0,4);
+  return dt.getFullYear()*100+(1+Math.round(((dt-w1)/864e5-3+((w1.getDay()+6)%7))/7));
+}
+function weekShift(d,w){ const x=new Date(d); x.setDate(x.getDate()+7*w); return x; }
+function sentThisWeek(){
+  const wk=weekKey(todayStr());
+  return S.apps.filter(a=>a.dates.postulee && weekKey(a.dates.postulee)===wk).length;
+}
+function streakWeeks(){
+  const counts={};
+  S.apps.forEach(a=>{ if(a.dates.postulee){ const k=weekKey(a.dates.postulee); counts[k]=(counts[k]||0)+1; } });
+  let streak=0, probe=new Date();
+  if((counts[weekKey(todayStr())]||0)>=S.quota){ streak=1; }
+  probe=weekShift(probe,-1);
+  while((counts[weekKey(probe.toISOString().slice(0,10))]||0)>=S.quota){ streak++; probe=weekShift(probe,-1); }
+  return streak;
+}
+function relancesDues(){
+  return S.apps.filter(a=>a.status==='postulee' && a.dates.postulee && daysSince(a.dates.postulee)>=RELANCE_DELAI);
+}
+function updateHeader(){ document.getElementById('wkBadge').textContent='🔥 '+streakWeeks()+' sem'; }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* ================================================================
+   NAVIGATION
+   ================================================================ */
+const main=document.getElementById('main');
+let curTab='today';
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); curTab=b.dataset.tab; render();
+});
+document.getElementById('fab').onclick=()=>editApp(null);
+function render(){ main.innerHTML='';
+  ({today:renderToday,pipe:renderPipe,hunt:renderHunt,me:renderMe})[curTab]();
+  updateHeader();
+}
+
+/* ================================================================
+   AUJOURD'HUI
+   ================================================================ */
+function coachMsg(){
+  const dues=relancesDues().length, sent=sentThisWeek();
+  const rep=S.apps.filter(a=>a.status==='reperee').length;
+  const post=S.apps.filter(a=>a.dates.postulee).length;
+  const ent=S.apps.filter(a=>a.dates.entretien).length;
+  if(!S.apps.length && !S.cv) return 'Zéro candidature, zéro CV dans l\'app. Le boss ne va pas se battre tout seul. Commence par coller ton CV dans <b>Profil</b> — ou mieux : donne-le à Claude pour qu\'il configure tes cibles.';
+  if(!S.apps.length) return 'Pipeline vide. Une seule mission aujourd\'hui : <b>repérer 3 offres</b> dans l\'onglet Chasse et les logger. Pas postuler — juste repérer. On démonte le mur brique par brique.';
+  if(dues>0) return `<b>${dues} relance${dues>1?'s':''} en retard.</b> Une relance prend 2 minutes et multiplie tes chances de réponse. C'est l'action au meilleur ratio effort/résultat de toute ta recherche. Fais-les MAINTENANT.`;
+  if(rep>=3 && rep>post*2) return `${rep} offres repérées, ${post} candidatures envoyées. Tu collectionnes les offres comme des cartes Pokémon. <b>Repérer n'est pas postuler</b> — le flou protège, mais il ne recrute pas.`;
+  if(sent<S.quota) return `<b>${S.quota-sent} candidature${S.quota-sent>1?'s':''}</b> encore à envoyer cette semaine. Pas "parfaites" — <b>envoyées</b>. Une candidature moyenne partie bat une candidature parfaite dans ta tête.`;
+  if(ent>0 && S.apps.some(a=>a.status==='entretien')) return 'Entretien dans le pipeline. Prépare 3 histoires concrètes (STAR) et 3 questions à poser. Tu es légitime : ils t\'ont appelé, pas l\'inverse.';
+  return 'Quota atteint, relances à jour. C\'est comme ça qu\'on travaille. Profite — et reviens lundi.';
+}
+function renderToday(){
+  const sent=sentThisWeek(), dues=relancesDues();
+  main.insertAdjacentHTML('beforeend',`
+  <div class="card hero">
+    <div class="big">${sent}/${S.quota} candidatures cette semaine</div>
+    <div class="quota">${[...Array(S.quota)].map((_,i)=>`<i class="${i<sent?'on':''}"></i>`).join('')}</div>
+    <div class="xptxt">${sent>=S.quota?'Quota atteint 🔥':'Le quota n\'est pas une suggestion.'} · streak : ${streakWeeks()} semaine${streakWeeks()>1?'s':''} · ${S.apps.filter(a=>a.dates.postulee).length} envoyées au total</div>
+  </div>
+  <div class="coach">${coachMsg()}</div>
+  <div class="cat" style="font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;margin:16px 0 8px;font-weight:700">Actions du jour</div>`);
+
+  const acts=[];
+  dues.forEach(a=>acts.push({urgent:true,ico:'📨',t:`Relancer ${a.company}`,s:`${a.role} · postulée il y a ${daysSince(a.dates.postulee)} j`,fn:()=>relanceOverlay(a)}));
+  S.apps.filter(a=>a.status==='entretien').forEach(a=>acts.push({ico:'🎙',t:`Préparer l'entretien — ${a.company}`,s:a.role,fn:()=>appDetail(a)}));
+  if(sent<S.quota){
+    const rep=S.apps.filter(a=>a.status==='reperee');
+    if(rep.length) acts.push({ico:'✉️',t:`Postuler à une repérée (${rep.length} en stock)`,s:rep.map(r=>r.company).slice(0,3).join(', ')+'…',fn:()=>{switchTab('pipe');}});
+    acts.push({ico:'🔍',t:'Chasser une nouvelle offre',s:'Liens directs vers tes plateformes',fn:()=>switchTab('hunt')});
+  }
+  if(!S.targets.length) acts.push({ico:'🎯',t:'Définir tes cibles de postes',s:'Ou colle ton CV à Claude — il le fait pour toi',fn:()=>switchTab('hunt')});
+  if(!acts.length) acts.push({ico:'😤',t:'Rien d\'urgent',s:'Repère 2 offres pour la semaine prochaine, ou va t\'entraîner.',fn:()=>switchTab('hunt')});
+  acts.slice(0,5).forEach(a=>{
+    const d=document.createElement('div'); d.className='act'+(a.urgent?' urgent':'');
+    d.innerHTML=`<div class="ico">${a.ico}</div><div class="t"><b>${a.t}</b><small>${a.s}</small></div><small style="color:var(--dim)">›</small>`;
+    d.onclick=a.fn; main.appendChild(d);
+  });
+}
+function switchTab(t){
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x.dataset.tab===t));
+  curTab=t; render();
+}
+
+/* ================================================================
+   PIPELINE
+   ================================================================ */
+function renderPipe(){
+  main.insertAdjacentHTML('beforeend','<h1 class="page">Pipeline</h1>');
+  if(!S.apps.length){
+    main.insertAdjacentHTML('beforeend','<div class="empty">Pipeline vide.<br>Le bouton ＋ en bas à droite. Une entreprise, un poste, 20 secondes.</div>');
+    return;
+  }
+  STATUSES.forEach(([key,label,col])=>{
+    const apps=S.apps.filter(a=>a.status===key).sort((x,y)=>(y.dates[key]||'').localeCompare(x.dates[key]||''));
+    if(!apps.length) return;
+    const colEl=document.createElement('div'); colEl.className='col';
+    colEl.innerHTML=`<h2 style="color:${col}">${label}<span class="n">${apps.length}</span></h2>`;
+    apps.forEach(a=>colEl.appendChild(appCard(a)));
+    main.appendChild(colEl);
+  });
+}
+function appCard(a){
+  const d=document.createElement('div'); d.className='appcard';
+  const ref=a.dates[a.status]||a.dates.reperee;
+  const age=ref?daysSince(ref):0;
+  const late=a.status==='postulee'&&age>=RELANCE_DELAI;
+  d.innerHTML=`<div class="top"><b>${a.company}</b><span class="plat">${a.platform}</span></div>
+    <div class="role">${a.role}</div>
+    <div class="age ${late?'late':''}">${late?'⚠️ À relancer — ':''}${age===0?'aujourd\'hui':'il y a '+age+' j'}${a.next?' · → '+a.next:''}</div>
+    <div class="acts"></div>`;
+  d.querySelector('.top').onclick=()=>appDetail(a);
+  const acts=d.querySelector('.acts');
+  (NEXT[a.status]||[]).forEach(nx=>{
+    const b=document.createElement('button'); b.className='btn small ghost';
+    b.textContent=STATUS_LABEL[nx];
+    b.onclick=()=>{
+      if(nx==='relancee'){ relanceOverlay(a); return; }
+      advance(a,nx);
+    };
+    acts.appendChild(b);
+  });
+  return d;
+}
+function advance(a,nx){
+  a.status=nx; a.dates[nx]=todayStr(); save(); render();
+  const msgs={postulee:'✉️ Envoyée. +1 vers le quota.',entretien:'🎙 ENTRETIEN. Ils t\'ont choisi dans la pile — retiens ça.',
+    offre:'🏆 OFFRE. On l\'a fait.',refus:'Suivant. Chaque refus est un tir calibré pour le prochain.',relancee:'📨 Relancée. Propre.'};
+  toast(msgs[nx]||'OK');
+}
+function relanceOverlay(a){
+  openCustom('Relancer '+a.company,(inner,close)=>{
+    const tpl=`Bonjour,\n\nJe me permets de revenir vers vous concernant ma candidature au poste de ${a.role}, envoyée le ${a.dates.postulee?a.dates.postulee.split('-').reverse().join('/'):'…'}.\n\nLe poste correspond précisément à ce que je recherche et je reste très motivé à l'idée d'échanger avec vous sur ce que je pourrais apporter à ${a.company}.\n\nJe reste disponible pour un échange au créneau qui vous conviendrait.\n\nBien cordialement,\n${S.name}`;
+    inner.insertAdjacentHTML('beforeend',`
+      <p class="sub" style="margin-bottom:10px">Template de relance — adapte une phrase, pas plus. L'objectif est d'exister à nouveau dans leur boîte mail, pas de gagner un prix littéraire.</p>
+      <div class="tpltxt" id="tpl">${tpl}</div>`);
+    const cp=document.createElement('button'); cp.className='btn ghost'; cp.textContent='📋 Copier le message';
+    cp.onclick=async()=>{
+      try{ await navigator.clipboard.writeText(tpl); toast('Copié. Va le coller. Maintenant.'); }
+      catch(e){ const r=document.createRange(); r.selectNodeContents(document.getElementById('tpl'));
+        const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); toast('Sélectionné — copie manuelle (Cmd+C).'); }
+    };
+    inner.appendChild(cp);
+    const done=document.createElement('button'); done.className='btn ok'; done.textContent='✓ Relance envoyée';
+    done.onclick=()=>{ advance(a,'relancee'); close(); };
+    inner.appendChild(done);
+  });
+}
+
+/* ----- fiche candidature ----- */
+function appDetail(a){
+  openCustom(a.company,(inner,close)=>{
+    const hist=STATUSES.filter(([k])=>a.dates[k]).map(([k,l])=>`${l} — ${a.dates[k].split('-').reverse().join('/')}`).join('<br>');
+    inner.insertAdjacentHTML('beforeend',`
+      <div class="card"><b style="font-size:17px">${a.role}</b>
+        <p class="sub" style="margin-top:4px">${a.platform}${a.url?` · <a href="${a.url}" target="_blank" style="color:var(--blue)">voir l'offre ↗</a>`:''}</p>
+        <p style="font-size:13px;color:#d9d5e0;margin-top:10px;line-height:1.7">${hist}</p>
+        ${a.notes?`<p style="font-size:13px;color:var(--dim);margin-top:10px;white-space:pre-wrap">${a.notes}</p>`:''}
+        ${a.next?`<p style="font-size:13px;margin-top:10px">Prochaine action : <b>${a.next}</b></p>`:''}
+      </div>`);
+    const ed=document.createElement('button'); ed.className='btn ghost'; ed.textContent='✏️ Modifier';
+    ed.onclick=()=>editApp(a);
+    inner.appendChild(ed);
+    const del=document.createElement('button'); del.className='btn danger'; del.textContent='Supprimer';
+    del.onclick=()=>{ if(confirm('Supprimer '+a.company+' ?')){ S.apps=S.apps.filter(x=>x.id!==a.id); save(); close(); } };
+    inner.appendChild(del);
+  });
+}
+
+/* ----- ajout / édition ----- */
+function editApp(a){
+  const isNew=!a;
+  openCustom(isNew?'Nouvelle candidature':'Modifier',(inner,close)=>{
+    inner.insertAdjacentHTML('beforeend',`
+      <label class="f">Entreprise *</label><input class="f" id="fc" value="${a?a.company:''}" placeholder="Ex : Décathlon">
+      <label class="f">Poste *</label><input class="f" id="fr" value="${a?a.role:''}" placeholder="Ex : Stage assistant chef de projet">
+      <label class="f">Plateforme</label><div class="chips" id="fp">${PLATFORMS.map(p=>`<span class="chip ${(a?a.platform:'LinkedIn')===p?'on':''}">${p}</span>`).join('')}</div>
+      <label class="f">Lien de l'offre</label><input class="f" id="fu" value="${a?a.url||'':''}" placeholder="https://…">
+      <label class="f">Statut</label><div class="chips" id="fs">${STATUSES.slice(0,2).map(([k,l])=>`<span class="chip ${(a?a.status:'reperee')===k?'on':''}" data-k="${k}">${l}</span>`).join('')}
+        ${a&&!['reperee','postulee'].includes(a.status)?`<span class="chip on" data-k="${a.status}">${STATUS_LABEL[a.status]}</span>`:''}</div>
+      <label class="f">Prochaine action (anti-flou)</label><input class="f" id="fn" value="${a?a.next||'':''}" placeholder="Ex : adapter le CV avant jeudi">
+      <label class="f">Notes</label><textarea class="f" id="fno" placeholder="Contact, salaire, ressenti…">${a?a.notes||'':''}</textarea>`);
+    inner.querySelectorAll('#fp .chip').forEach(c=>c.onclick=()=>{
+      inner.querySelectorAll('#fp .chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); });
+    inner.querySelectorAll('#fs .chip').forEach(c=>c.onclick=()=>{
+      inner.querySelectorAll('#fs .chip').forEach(x=>x.classList.remove('on')); c.classList.add('on'); });
+    const sv=document.createElement('button'); sv.className='btn'; sv.textContent=isNew?'Ajouter au pipeline':'Enregistrer';
+    sv.onclick=()=>{
+      const company=inner.querySelector('#fc').value.trim(), role=inner.querySelector('#fr').value.trim();
+      if(!company||!role) return toast('Entreprise et poste : obligatoires. Pas de flou.');
+      const platform=inner.querySelector('#fp .chip.on').textContent;
+      const status=inner.querySelector('#fs .chip.on').dataset.k;
+      const url=inner.querySelector('#fu').value.trim(), next=inner.querySelector('#fn').value.trim(), notes=inner.querySelector('#fno').value.trim();
+      if(isNew){
+        const app={id:Date.now(),company,role,platform,url,status,next,notes,dates:{reperee:todayStr()}};
+        if(status==='postulee') app.dates.postulee=todayStr();
+        S.apps.push(app);
+        toast(status==='postulee'?'✉️ Loggée comme envoyée. +1.':'🔎 Repérée. Maintenant : postule.');
+      } else {
+        Object.assign(a,{company,role,platform,url,next,notes});
+        if(status!==a.status){ a.status=status; a.dates[status]=a.dates[status]||todayStr(); }
+        toast('Modifié.');
+      }
+      save(); close();
+    };
+    inner.appendChild(sv);
+  });
+}
+
+/* ================================================================
+   CHASSE
+   ================================================================ */
+function huntLinks(kw){
+  const q=encodeURIComponent(kw), l=encodeURIComponent(S.loc);
+  return [
+    ['LinkedIn',`https://www.linkedin.com/jobs/search/?keywords=${q}&location=${l}`],
+    ['Indeed',`https://fr.indeed.com/jobs?q=${q}&l=${l}`],
+    ['WTTJ',`https://www.welcometothejungle.com/fr/jobs?query=${q}`],
+    ['JobTeaser',`https://www.jobteaser.com/fr/job-offers?q=${q}`],
+    ['HelloWork',`https://www.hellowork.com/fr-fr/emploi/recherche.html?k=${q}&l=${l}`],
+  ];
+}
+function renderHunt(){
+  main.insertAdjacentHTML('beforeend',`<h1 class="page">Chasse</h1>
+    <p class="sub" style="margin:-8px 0 14px">Tes cibles, avec recherche en 1 tap sur chaque plateforme (lieu : ${S.loc}). Une offre trouvée = tu la logges en Repérée <b>immédiatement</b>, sinon elle n'existe pas.</p>`);
+  if(!S.targets.length){
+    main.insertAdjacentHTML('beforeend',`<div class="empty">Aucune cible définie.<br><br>
+      <b>Le raccourci intelligent :</b> colle ton CV à Claude dans le chat,<br>il te dit à quels postes prétendre et pourquoi,<br>et tu crées tes cibles ici avec sa réponse.<br><br>Une cible floue = une recherche floue = zéro candidature.</div>`);
+  }
+  S.targets.forEach((t,ti)=>{
+    const d=document.createElement('div'); d.className='target';
+    d.innerHTML=`<span class="del">✕</span><b>${t.role}</b>
+      <div class="why">${t.why||''}</div>
+      <div class="platlinks">${huntLinks(t.kw||t.role).map(([n,u])=>`<a href="${u}" target="_blank">${n} ↗</a>`).join('')}</div>`;
+    d.querySelector('.del').onclick=()=>{ if(confirm('Supprimer cette cible ?')){ S.targets.splice(ti,1); save(); render(); } };
+    main.appendChild(d);
+  });
+  const add=document.createElement('button'); add.className='btn ghost'; add.textContent='＋ Ajouter une cible';
+  add.onclick=()=>editTarget();
+  main.appendChild(add);
+}
+function editTarget(){
+  openCustom('Nouvelle cible',(inner,close)=>{
+    inner.insertAdjacentHTML('beforeend',`
+      <label class="f">Intitulé de poste *</label><input class="f" id="tr" placeholder="Ex : Stage business developer">
+      <label class="f">Mots-clés de recherche</label><input class="f" id="tk" placeholder="Ex : stage business development (par défaut : l'intitulé)">
+      <label class="f">Pourquoi toi ? (ton argument en 1 phrase)</label><textarea class="f" id="tw" placeholder="Ce que tu réponds quand on te demande pourquoi ce poste. Si tu ne sais pas le remplir, demande à Claude — avec ton CV sous les yeux."></textarea>`);
+    const sv=document.createElement('button'); sv.className='btn'; sv.textContent='Créer la cible';
+    sv.onclick=()=>{
+      const role=inner.querySelector('#tr').value.trim();
+      if(!role) return toast('Un intitulé. Précis.');
+      S.targets.push({role,kw:inner.querySelector('#tk').value.trim(),why:inner.querySelector('#tw').value.trim()});
+      save(); close();
+    };
+    inner.appendChild(sv);
+  });
+}
+
+/* ================================================================
+   PROFIL
+   ================================================================ */
+function renderMe(){
+  const post=S.apps.filter(a=>a.dates.postulee).length;
+  const ent=S.apps.filter(a=>a.dates.entretien).length;
+  const off=S.apps.filter(a=>a.dates.offre).length;
+  const rep=S.apps.filter(a=>a.dates.reperee).length;
+  const answered=S.apps.filter(a=>a.dates.entretien||a.status==='refus'||a.dates.offre).length;
+
+  main.insertAdjacentHTML('beforeend',`<h1 class="page">Profil & stats</h1>
+  <div class="statgrid">
+    <div class="stat"><b>${post}</b><small>candidatures envoyées</small></div>
+    <div class="stat"><b>${post?Math.round(answered/post*100)+'%':'–'}</b><small>taux de réponse</small></div>
+    <div class="stat"><b>${ent}</b><small>entretiens décrochés</small></div>
+    <div class="stat"><b>${streakWeeks()}</b><small>semaines au quota</small></div>
+  </div>`);
+
+  /* funnel */
+  const fn=document.createElement('div'); fn.className='card funnel'; fn.style.marginTop='12px';
+  fn.innerHTML='<b style="font-size:15px">Le funnel</b><p class="sub" style="margin:4px 0 12px">C\'est un jeu de volume : chaque étage se nourrit du précédent.</p>';
+  const mx=Math.max(rep,1);
+  [['Repérées',rep,'#918b9f'],['Postulées',post,'#5b9cff'],['Entretiens',ent,'#f5b840'],['Offres',off,'#3ecf7a']].forEach(([l,v,c])=>{
+    fn.insertAdjacentHTML('beforeend',`<div class="frow"><small>${l}</small><div class="bar"><i style="width:${v/mx*100}%;background:${c}"></i></div><b>${v}</b></div>`);
+  });
+  main.appendChild(fn);
+
+  /* candidatures / semaine */
+  const wb=document.createElement('div'); wb.className='card';
+  wb.innerHTML=`<b style="font-size:15px">Candidatures par semaine</b><p class="sub" style="margin-top:4px">Ligne dorée = ton quota (${S.quota}).</p>`;
+  const bars=document.createElement('div'); bars.className='weekbars';
+  const weeks=[...Array(8)].map((_,k)=>{
+    const key=weekKey(weekShift(new Date(),k-7).toISOString().slice(0,10));
+    return {label:k===7?'now':'S-'+(7-k), n:S.apps.filter(a=>a.dates.postulee&&weekKey(a.dates.postulee)===key).length};
+  });
+  const wmx=Math.max(...weeks.map(w=>w.n),S.quota);
+  weeks.forEach(w=>{
+    const col=document.createElement('div'); col.className='colw'+(w.n?'':' z');
+    col.innerHTML=`<div class="bar" style="height:${Math.max(2,w.n/wmx*62)}px"></div><small>${w.label}</small>`;
+    bars.appendChild(col);
+  });
+  wb.appendChild(bars);
+  main.appendChild(wb);
+
+  /* CV + pitch */
+  const cv=document.createElement('div'); cv.className='card';
+  cv.innerHTML=`<b style="font-size:15px">Mon CV (texte)</b>
+    <p class="sub" style="margin:4px 0 8px">Colle ton CV ici pour l'avoir toujours sous la main — et colle-le aussi à Claude : il te dira à quels postes prétendre, ce qui manque, et quoi mettre en avant selon l'offre.</p>
+    <textarea class="f" id="cvt" placeholder="Formation, expériences, langues (arabe, espagnol…), projets…">${S.cv}</textarea>
+    <label class="f">Pitch 30 secondes</label>
+    <textarea class="f" id="pt" placeholder="Qui tu es, ce que tu cherches, ce que tu apportes. 3 phrases.">${S.pitch}</textarea>`;
+  main.appendChild(cv);
+  cv.querySelector('#cvt').onchange=e=>{ S.cv=e.target.value; save(); toast('CV sauvegardé.'); };
+  cv.querySelector('#pt').onchange=e=>{ S.pitch=e.target.value; save(); toast('Pitch sauvegardé.'); };
+
+  /* réglages */
+  const st=document.createElement('div'); st.className='card';
+  st.innerHTML=`<b style="font-size:15px">Réglages</b>
+    <label class="f">Lieu de recherche</label><input class="f" id="loc" value="${S.loc}">
+    <label class="f">Quota hebdo (candidatures envoyées)</label><input class="f" id="qt" type="number" value="${S.quota}">`;
+  main.appendChild(st);
+  st.querySelector('#loc').onchange=e=>{ S.loc=e.target.value.trim()||'Paris'; save(); };
+  st.querySelector('#qt').onchange=e=>{ S.quota=Math.max(1,Math.min(20,+e.target.value||5)); save(); render(); };
+
+  /* export / import */
+  const ex=document.createElement('div'); ex.className='card';
+  ex.innerHTML='<b style="font-size:15px">Données</b>';
+  const eb=document.createElement('button'); eb.className='btn ghost'; eb.textContent='⬇️ Exporter (JSON)';
+  eb.onclick=()=>{
+    const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='offensive-'+todayStr()+'.json'; a.click();
+  };
+  const ib=document.createElement('button'); ib.className='btn ghost'; ib.textContent='⬆️ Importer (JSON)';
+  ib.onclick=()=>{
+    const inp=document.createElement('input'); inp.type='file'; inp.accept='.json';
+    inp.onchange=()=>{
+      const f=inp.files[0]; if(!f) return;
+      const rd=new FileReader();
+      rd.onload=()=>{ try{ S=Object.assign({},DEFAULT,JSON.parse(rd.result)); save(); render(); toast('Importé.'); }catch(e){ toast('Fichier invalide.'); } };
+      rd.readAsText(f);
+    };
+    inp.click();
+  };
+  ex.appendChild(eb); ex.appendChild(ib);
+  main.appendChild(ex);
+}
+
+/* ================================================================
+   OVERLAY
+   ================================================================ */
+const overlay=document.getElementById('overlay');
+const overlayInner=document.getElementById('overlayInner');
+function closeOverlay(){ overlay.classList.remove('open'); render(); }
+function openCustom(title,fill){
+  overlayInner.innerHTML=`<div class="topbar"><button class="back">←</button><b>${title}</b></div>`;
+  overlayInner.querySelector('.back').onclick=closeOverlay;
+  overlay.classList.add('open'); overlay.scrollTop=0;
+  fill(overlayInner,closeOverlay);
+}
+
+/* ---------------- init ---------------- */
+render();
+</script>
+</body>
+</html>
